@@ -8,14 +8,28 @@
 
 void main_task(void *parg)
 {
-    ESP_LOGI(TAG, "Hello from FreeRTOS task!");
+    ESP_LOGI(TAG, "Main task started.");
 
-    // Initialize the ST7262 LCD panel
-    esp_lcd_panel_st7262_init();
-    
+    const esp_lcd_panel_st7262_config_handle_t panel_config = &ESP_LCD_PANEL_ST7262_8048S043;
+    esp_lcd_panel_st7262_panel_t panel;
+
+    esp_err_t error = esp_lcd_panel_st7262_init(panel_config, &panel);
+    if (error != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize ST7262 LCD panel: %s", esp_err_to_name(error));
+        return;
+    }
+
     while (true)
     {
         ESP_LOGI(TAG, "Running...");
+        static bool on = true;
+
+        // Toggle the backlight
+        esp_lcd_panel_st7262_backlight_on_ff(panel_config, on);
+
+        on = !on;
+
         vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 second
     }
 }

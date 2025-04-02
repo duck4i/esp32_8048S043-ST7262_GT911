@@ -1,5 +1,7 @@
 #ifndef _ESP_LCD_ST7262_H_
 #define _ESP_LCD_ST7262_H_
+#include <stdint.h>
+#include <esp_lcd_panel_rgb.h>
 
 typedef struct {
     /* R */
@@ -38,6 +40,7 @@ typedef struct {
 } esp_lcd_panel_st7262_timing_t;
 
 typedef struct {
+    int bl; // Backlight control
     int de;
     int hsync;
     int vsync;
@@ -52,6 +55,14 @@ typedef struct {
     esp_lcd_panel_st7262_rgb565_t colour;
 } esp_lcd_panel_st7262_conf_t;
 
+typedef esp_lcd_panel_st7262_conf_t *esp_lcd_panel_st7262_config_handle_t;
+
+typedef struct {
+    esp_lcd_panel_handle_t handle;
+} esp_lcd_panel_st7262_panel_t;
+
+typedef esp_lcd_panel_st7262_panel_t *esp_lcd_panel_st7262_handle_t; 
+
 /** Concrete device implementations */
 
 static const esp_lcd_panel_st7262_conf_t ESP_LCD_PANEL_ST7262_8048S043 = 
@@ -59,6 +70,7 @@ static const esp_lcd_panel_st7262_conf_t ESP_LCD_PANEL_ST7262_8048S043 =
     .width = 800,
     .height = 600,
     .gpio = {
+        .bl = 2,
         .de = 40,
         .vsync = 41,
         .hsync = 39,
@@ -100,6 +112,15 @@ static const esp_lcd_panel_st7262_conf_t ESP_LCD_PANEL_ST7262_8048S043 =
     }
 };
 
-void esp_lcd_panel_st7262_init();
+esp_err_t esp_lcd_panel_st7262_init(const esp_lcd_panel_st7262_config_handle_t conf, esp_lcd_panel_st7262_handle_t out_handle);
+esp_err_t esp_lcd_panel_st7262_del(const esp_lcd_panel_st7262_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_mirror(const esp_lcd_panel_st7262_handle_t panel, bool mirror_x, bool mirror_y);
+esp_err_t esp_lcd_panel_st7262_swap_xy(const esp_lcd_panel_st7262_handle_t panel, bool swap_axes);
+esp_err_t esp_lcd_panel_st7262_refresh(const esp_lcd_panel_st7262_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_restart(const esp_lcd_panel_st7262_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_disp_on_ff(const esp_lcd_panel_st7262_handle_t conf, bool on);
+esp_err_t esp_lcd_panel_st7262_draw_bitmap(const esp_lcd_panel_st7262_handle_t panel, int x_start, int y_start, int x_end, int y_end, const void *color_data);
+
+esp_err_t esp_lcd_panel_st7262_backlight_on_ff(const esp_lcd_panel_st7262_config_handle_t conf, bool on);
 
 #endif
