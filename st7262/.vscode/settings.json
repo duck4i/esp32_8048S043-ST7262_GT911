@@ -1,0 +1,11 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPath": "/Users/duck/esp/v5.3.2/esp-idf",
+    "idf.pythonInstallPath": "/opt/homebrew/bin/python3",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32s3.cfg"
+    ],
+    "idf.port": "/dev/tty.debug-console",
+    "idf.toolsPath": "/Users/duck/esp/tools"
+}
