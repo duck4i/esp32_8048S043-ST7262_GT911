@@ -5,6 +5,8 @@
 
 #define TAG "ESP_LCD_ST7262"
 
+esp_lcd_rgb_panel_config_t p;
+
 void esp_lcd_panel_st7262_init()
 {
     ESP_LOGI(TAG, "Initializing ST7262 LCD panel...");
