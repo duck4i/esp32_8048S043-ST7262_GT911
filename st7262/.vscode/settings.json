@@ -6,6 +6,16 @@
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32s3.cfg"
     ],
-    "idf.port": "/dev/tty.debug-console",
-    "idf.toolsPath": "/Users/duck/esp/tools"
+    "idf.port": "/dev/tty.usbserial-11230",
+    "idf.toolsPath": "/Users/duck/esp/tools",
+    "idf.enableIdfComponentManager": true,
+    "idf.flashType": "UART",
+    "idf.customExtraVars": {
+        "IDF_TARGET": "esp32s3"
+    },
+    "files.associations": {
+        "driver-8048s043.h": "c",
+        "esp_lcd_st7262.h": "c",
+        "esp_lcd_panel_rgb.h": "c"
+    }
 }
