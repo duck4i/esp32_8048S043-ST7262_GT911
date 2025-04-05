@@ -24,7 +24,7 @@
 #include <lv_demos.h>
 
 #if USE_TOUCH
-#include "gt911.h"
+#include <gt911.h>
 
 #define TOUCH_GT911_SCL 20
 #define TOUCH_GT911_SDA 19

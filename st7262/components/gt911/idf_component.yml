@@ -1,0 +1,7 @@
+## IDF Component Manager Manifest File
+version: 0.1.0
+description: "GT911 LCD touch driver for ESP-IDF"
+dependencies:
+  idf:
+    version: '>=5.1.0'
+    public: true
