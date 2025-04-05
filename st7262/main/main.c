@@ -128,7 +128,7 @@ void main_task(void *parg)
 {
     ESP_LOGI(TAG, "Main task started.");
 
-    static esp_lcd_panel_st7262_panel_t panel;
+    esp_lcd_panel_st7262_panel_t panel;
     esp_lcd_panel_st7262_conf_t panel_config = ESP_LCD_PANEL_ST7262_8048S043;
 
     esp_err_t error = esp_lcd_panel_st7262_new(&panel_config, &panel);
