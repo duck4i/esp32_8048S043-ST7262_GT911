@@ -8,13 +8,15 @@
 #include <esp_system.h>
 #include <esp_heap_caps.h>
 #include <esp_lcd_st7262.h>
-#include <lvgl.h>
-#include <lv_demos.h>
 
 // #define LVGL_PORT 1
+#define USE_LVGL 1
+// #define TEST_FULL_SCREEN 1
 #define TAG "ESP32-MAIN"
 
-#ifndef LVGL_PORT
+#ifdef USE_LVGL
+#include <lvgl.h>
+#include <lv_demos.h>
 
 static void render_flush_display(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
 {
@@ -27,8 +29,6 @@ static uint32_t esp_tick(void)
 {
     return esp_timer_get_time() / 1000;
 }
-
-#endif
 
 void setup_lvgl(uint32_t width, uint32_t height, esp_lcd_panel_st7262_panel_handle_t panel)
 {
@@ -58,6 +58,8 @@ void setup_lvgl(uint32_t width, uint32_t height, esp_lcd_panel_st7262_panel_hand
 
     ESP_LOGI(TAG, "LVGL Demo started.");
 }
+
+#endif
 
 void main_task(void *parg)
 {
@@ -94,62 +96,21 @@ void main_task(void *parg)
         return;
     }
 
-#if 0
-    // Define a 5x5 pixel array (red gradient)
-    uint16_t test_pixels[5][5] = {
-        {0xF800, 0xF000, 0xE800, 0xE000, 0xD800}, // Row 0: Bright red to darker red
-        {0xD000, 0xC800, 0xC000, 0xB800, 0xB000}, // Row 1: Continuing gradient
-        {0xA800, 0xA000, 0x9800, 0x9000, 0x8800}, // Row 2: Continuing gradient
-        {0x8000, 0x7800, 0x7000, 0x6800, 0x6000}, // Row 3: Continuing gradient
-        {0x5800, 0x5000, 0x4800, 0x4000, 0x3800}  // Row 4: Continuing gradient
-    };
-
-    esp_lcd_panel_st7262_draw_bitmap(panel_handle, 0, 0, 4, 4, (void *)test_pixels);
-    esp_lcd_panel_st7262_refresh(panel_handle);
-    ESP_LOGI(TAG, "Drew test pattern manual pixels");
-#endif
-
-    /*
-    void* fb = NULL;
-    esp_lcd_rgb_panel_get_frame_buffer(panel_handle->handle, 1, (void **)&fb);
-    //
-    lv_memcpy(fb, test_pixels, 5 * 5 * sizeof(uint16_t));
-    */
-
-#if 0
-    uint16_t *test_pixels = heap_caps_malloc(panel_config->width * panel_config->height * sizeof(uint16_t), MALLOC_CAP_DMA);
+#if TEST_FULL_SCREEN
+    uint16_t *test_pixels = heap_caps_malloc(panel_config.width * panel_config.height * sizeof(uint16_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     if (test_pixels != NULL)
     {
-        for (int i = 0; i < panel_config->width * panel_config->height; i++)
+        for (int i = 0; i < panel_config.width * panel_config.height; i++)
         {
             test_pixels[i] = 0xF800; // Bright red in RGB565 format
         }
-        esp_lcd_panel_st7262_draw_bitmap(panel_handle, 0, 0, panel_config->width - 1, panel_config->height - 1, test_pixels);
-        //esp_lcd_panel_st7262_refresh(panel_handle);
+        esp_lcd_panel_st7262_draw_bitmap(&panel, 0, 0, panel_config.width - 1, panel_config.height - 1, test_pixels);
         ESP_LOGI(TAG, "Drew test pattern");
         free(test_pixels);
     }
 #endif
 
-#if 0
-    void *fb = NULL;
-    esp_lcd_rgb_panel_get_frame_buffer(panel_handle->handle, 1, (void **)&fb);
-
-    if (fb != NULL)
-    {
-        for (int i = 0; i < panel_config->width * panel_config->height; i++)
-        {
-            *((uint16_t *)fb + i) = 0xF800; // Bright red in RGB565 format
-        }
-         esp_lcd_panel_st7262_draw_bitmap(panel_handle, 0, 0, panel_config->width - 1, panel_config->height - 1, fb);
-        // esp_lcd_panel_st7262_refresh(panel_handle);
-        ESP_LOGI(TAG, "Drew test pattern");
-        // free(test_pixels);
-    }
-
-    Cache_WriteBack_Addr(fb, 20);
-#endif
-
+#ifdef USE_LVGL
     setup_lvgl(panel_config.width, panel_config.height, &panel);
 
     while (true)
@@ -157,6 +118,13 @@ void main_task(void *parg)
         lv_timer_handler();
         vTaskDelay(pdMS_TO_TICKS(5));
     }
+#else
+    while (true)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        ESP_LOGI(TAG, "Main task running...");
+    }
+#endif
 }
 
 void app_main(void)
