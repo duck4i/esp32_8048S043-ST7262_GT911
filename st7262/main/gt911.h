@@ -25,7 +25,6 @@
 #define GT911_Y_OUTPUT_MAX_LOW         (uint16_t)0x804A
 #define GT911_Y_OUTPUT_MAX_HIGH        (uint16_t)0x804B
 #define GT911_TOUCH_NUMBER             (uint16_t)0x804C
-// ... (all register definitions remain the same)
 #define GT911_CONFIG_CHKSUM            (uint16_t)0X80FF
 #define GT911_CONFIG_FRESH             (uint16_t)0X8100
 #define GT911_CONFIG_SIZE              (uint16_t)0xFF-0x46
@@ -84,5 +83,6 @@ esp_err_t gt911_reset(gt911_handle_t *dev);
 esp_err_t gt911_set_rotation(gt911_handle_t *dev, uint8_t rot);
 esp_err_t gt911_set_resolution(gt911_handle_t *dev, uint16_t width, uint16_t height);
 esp_err_t gt911_read(gt911_handle_t *dev);
+esp_err_t gt911_map_to_screen(gt911_handle_t *dev, int32_t scr_width, int32_t scr_height, int32_t x, int32_t y, int32_t *mapped_x, int32_t *mapped_y);
 
 #endif // GT911_H
