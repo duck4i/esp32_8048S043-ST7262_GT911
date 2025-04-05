@@ -7,6 +7,27 @@
 
 #define TAG "GT911"
 
+static bool gt911_gpio_is_valid(uint8_t pin)
+{
+    return (pin >= GPIO_NUM_0 && pin <= GPIO_NUM_MAX);
+}
+
+static void gt911_safe_set_pin_direction(uint8_t pin, gpio_mode_t mode)
+{
+    if (gt911_gpio_is_valid(pin))
+    {
+        gpio_set_direction(pin, mode);
+    }
+}
+
+static void gt911_safe_set_pin_level(uint8_t pin, uint8_t level)
+{
+    if (gt911_gpio_is_valid(pin))
+    {
+        gpio_set_level(pin, level);
+    }
+}
+
 // Helper functions for I2C communication
 static esp_err_t gt911_i2c_init(i2c_port_t i2c_port, uint8_t sda, uint8_t scl)
 {
@@ -267,25 +288,25 @@ esp_err_t gt911_reset(gt911_handle_t *dev)
     gpio_pad_select_gpio(dev->pin_int);
     gpio_pad_select_gpio(dev->pin_rst);
 
-    gpio_set_direction(dev->pin_int, GPIO_MODE_OUTPUT);
-    gpio_set_direction(dev->pin_rst, GPIO_MODE_OUTPUT);
+    gt911_safe_set_pin_direction(dev->pin_int, GPIO_MODE_OUTPUT);
+    gt911_safe_set_pin_direction(dev->pin_rst, GPIO_MODE_OUTPUT);
 
     // Reset sequence
-    gpio_set_level(dev->pin_int, 0);
-    gpio_set_level(dev->pin_rst, 0);
+    gt911_safe_set_pin_level(dev->pin_int, 0);
+    gt911_safe_set_pin_level(dev->pin_rst, 0);
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    gpio_set_level(dev->pin_int, dev->addr == GT911_ADDR2);
+    gt911_safe_set_pin_level(dev->pin_int, dev->addr == GT911_ADDR2);
     vTaskDelay(1 / portTICK_PERIOD_MS);
 
-    gpio_set_level(dev->pin_rst, 1);
+    gt911_safe_set_pin_level(dev->pin_rst, 1);
     vTaskDelay(5 / portTICK_PERIOD_MS);
 
-    gpio_set_level(dev->pin_int, 0);
+    gt911_safe_set_pin_level(dev->pin_int, 0);
     vTaskDelay(50 / portTICK_PERIOD_MS);
 
     // Set INT pin to input mode for touch detection
-    gpio_set_direction(dev->pin_int, GPIO_MODE_INPUT);
+    gt911_safe_set_pin_direction(dev->pin_int, GPIO_MODE_INPUT);
     vTaskDelay(50 / portTICK_PERIOD_MS);
 
     // Read configuration from GT911
