@@ -14,6 +14,7 @@ This component works the same as the other esp_lcd modules, once created you wil
 Example configuration:
 
 ```c
+    #include <esp_lcd_st7262.h>
 
     esp_lcd_panel_st7262_panel_t panel;
     esp_lcd_panel_st7262_conf_t panel_config = ESP_LCD_PANEL_ST7262_8048S043;
