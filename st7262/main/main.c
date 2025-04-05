@@ -9,9 +9,10 @@
 #include <esp_heap_caps.h>
 #include <esp_lcd_st7262.h>
 
+#define USE_TOUCH 1
 #define USE_LVGL 1
-//#define USE_LVGL_PORT 1
-// #define TEST_FULL_SCREEN 1
+// #define USE_LVGL_PORT 1
+//  #define TEST_FULL_SCREEN 1
 
 #define STACK_SIZE 8192
 #define TASK_PRIORITY 9
@@ -21,6 +22,73 @@
 #ifdef USE_LVGL
 #include <lvgl.h>
 #include <lv_demos.h>
+
+#if USE_TOUCH
+#include <gt911.h>
+
+#define TOUCH_GT911_SCL 20
+#define TOUCH_GT911_SDA 19
+#define TOUCH_GT911_INT -1
+#define TOUCH_GT911_RST 38
+#define TOUCH_GT911_ROTATION ROTATION_NORMAL
+#define TOUCH_MAP_X1 480
+#define TOUCH_MAP_X2 0
+#define TOUCH_MAP_Y1 272
+#define TOUCH_MAP_Y2 0
+
+static gt911_handle_t gt911_dev;
+
+void init_touch(void)
+{
+    ESP_LOGI(TAG, "Initializing GT911 touchscreen");
+
+    // Initialize the GT911 touchscreen controller
+    esp_err_t ret = gt911_init(&gt911_dev, TOUCH_GT911_SDA, TOUCH_GT911_SCL, TOUCH_GT911_INT, TOUCH_GT911_RST,
+                               TOUCH_MAP_X1, TOUCH_MAP_Y1, I2C_NUM_0, GT911_ADDR1);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize GT911: %s", esp_err_to_name(ret));
+        return;
+    }
+
+    // Set rotation if needed
+    ret = gt911_set_rotation(&gt911_dev, ROTATION_INVERTED);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to set rotation: %s", esp_err_to_name(ret));
+    }
+
+    ESP_LOGI(TAG, "GT911 initialized successfully");
+}
+
+void input_read(lv_indev_t *indev, lv_indev_data_t *data)
+{
+    static bool input_initalized = false;
+    if (!input_initalized)
+    {
+        init_touch();
+        input_initalized = true;
+    }
+
+    if (gt911_read(&gt911_dev) == ESP_OK)
+    {
+        data->state = gt911_dev.is_touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+
+        int32_t touch_last_x = 0;
+        int32_t touch_last_y = 0;
+
+        gt911_map_to_screen(&gt911_dev, 800, 480, gt911_dev.points[0].x, gt911_dev.points[0].y, &touch_last_x, &touch_last_y);
+
+        data->point.x = touch_last_x;
+        data->point.y = touch_last_y;
+    }
+    else
+    {
+        data->state = LV_INDEV_STATE_REL;
+    }
+}
+
+#endif
 
 static void render_flush_display(lv_display_t *display, const lv_area_t *area, uint8_t *px_map)
 {
@@ -57,8 +125,15 @@ static void setup_lvgl(uint32_t width, uint32_t height, esp_lcd_panel_st7262_pan
 
     lv_display_set_buffers(disp_handle, draw_buf, NULL, size, LV_DISP_RENDER_MODE_PARTIAL);
 
+    lv_indev_t *indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, input_read);
+
     lv_demo_widgets();
+
+#ifndef USE_TOUCH
     lv_demo_widgets_start_slideshow();
+#endif
 
     ESP_LOGI(TAG, "LVGL Demo started.");
 }
