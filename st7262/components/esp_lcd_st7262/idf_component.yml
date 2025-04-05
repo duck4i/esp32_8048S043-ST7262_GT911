@@ -3,5 +3,5 @@ version: 0.1.0
 description: "ST7262 LCD driver for ESP-IDF"
 dependencies:
   idf:
-    version: '>=4.1.0'
+    version: '>=5.1.0'
     public: true

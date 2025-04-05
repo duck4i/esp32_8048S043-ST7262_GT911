@@ -50,6 +50,7 @@ typedef struct {
 typedef struct {
     uint32_t width;
     uint32_t height;
+    bool swap_BGR565;
     esp_lcd_panel_st7262_gpio_t gpio;
     esp_lcd_panel_st7262_timing_t timing;
     esp_lcd_panel_st7262_rgb565_t colour;
@@ -61,14 +62,15 @@ typedef struct {
     esp_lcd_panel_handle_t handle;
 } esp_lcd_panel_st7262_panel_t;
 
-typedef esp_lcd_panel_st7262_panel_t *esp_lcd_panel_st7262_handle_t; 
+typedef esp_lcd_panel_st7262_panel_t *esp_lcd_panel_st7262_panel_handle_t; 
 
 /** Concrete device implementations */
 
 static const esp_lcd_panel_st7262_conf_t ESP_LCD_PANEL_ST7262_8048S043 = 
 {
     .width = 800,
-    .height = 600,
+    .height = 480,
+    .swap_BGR565 = true,
     .gpio = {
         .bl = 2,
         .de = 40,
@@ -89,7 +91,7 @@ static const esp_lcd_panel_st7262_conf_t ESP_LCD_PANEL_ST7262_8048S043 =
             .back_porch = 8,
             .pulse_width = 4,
         },
-        .pclk_hz = 16 * 100 * 100,
+        .pclk_hz = 16 * 1000 * 1000,
         .pclk_active_neg = 1,
     },
     .colour = {
@@ -112,15 +114,20 @@ static const esp_lcd_panel_st7262_conf_t ESP_LCD_PANEL_ST7262_8048S043 =
     }
 };
 
-esp_err_t esp_lcd_panel_st7262_init(const esp_lcd_panel_st7262_config_handle_t conf, esp_lcd_panel_st7262_handle_t out_handle);
-esp_err_t esp_lcd_panel_st7262_del(const esp_lcd_panel_st7262_handle_t panel);
-esp_err_t esp_lcd_panel_st7262_mirror(const esp_lcd_panel_st7262_handle_t panel, bool mirror_x, bool mirror_y);
-esp_err_t esp_lcd_panel_st7262_swap_xy(const esp_lcd_panel_st7262_handle_t panel, bool swap_axes);
-esp_err_t esp_lcd_panel_st7262_refresh(const esp_lcd_panel_st7262_handle_t panel);
-esp_err_t esp_lcd_panel_st7262_restart(const esp_lcd_panel_st7262_handle_t panel);
-esp_err_t esp_lcd_panel_st7262_disp_on_ff(const esp_lcd_panel_st7262_handle_t conf, bool on);
-esp_err_t esp_lcd_panel_st7262_draw_bitmap(const esp_lcd_panel_st7262_handle_t panel, int x_start, int y_start, int x_end, int y_end, const void *color_data);
+esp_err_t esp_lcd_panel_st7262_new(const esp_lcd_panel_st7262_config_handle_t conf, esp_lcd_panel_st7262_panel_handle_t out_handle);
+esp_err_t esp_lcd_panel_st7262_del(const esp_lcd_panel_st7262_panel_handle_t panel);
 
+/* ESP_LCD_PANEL methods re-exported */
+esp_err_t esp_lcd_panel_st7262_init(const esp_lcd_panel_st7262_panel_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_mirror(const esp_lcd_panel_st7262_panel_handle_t panel, bool mirror_x, bool mirror_y);
+esp_err_t esp_lcd_panel_st7262_swap_xy(const esp_lcd_panel_st7262_panel_handle_t panel, bool swap_axes);
+esp_err_t esp_lcd_panel_st7262_reset(const esp_lcd_panel_st7262_panel_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_refresh(const esp_lcd_panel_st7262_panel_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_restart(const esp_lcd_panel_st7262_panel_handle_t panel);
+esp_err_t esp_lcd_panel_st7262_disp_on_ff(const esp_lcd_panel_st7262_panel_handle_t panel, bool on);
+esp_err_t esp_lcd_panel_st7262_draw_bitmap(const esp_lcd_panel_st7262_panel_handle_t panel, int x_start, int y_start, int x_end, int y_end, const void *color_data);
+
+/* Extra methods support */
 esp_err_t esp_lcd_panel_st7262_backlight_on_ff(const esp_lcd_panel_st7262_config_handle_t conf, bool on);
 
 #endif

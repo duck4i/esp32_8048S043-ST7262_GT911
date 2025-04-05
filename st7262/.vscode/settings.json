@@ -16,6 +16,12 @@
     "files.associations": {
         "driver-8048s043.h": "c",
         "esp_lcd_st7262.h": "c",
-        "esp_lcd_panel_rgb.h": "c"
+        "esp_lcd_panel_rgb.h": "c",
+        "esp_lcd_panel_commands.h": "c",
+        "esp_lcd_panel_dev.h": "c",
+        "esp_lcd_panel_interface.h": "c",
+        "esp_lcd_panel_ops.h": "c",
+        "format": "c",
+        "esp_lcd_panel_io.h": "c"
     }
 }
