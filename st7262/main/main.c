@@ -74,9 +74,6 @@ void input_read(lv_indev_t *indev, lv_indev_data_t *data)
     {
         data->state = gt911_dev.is_touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 
-        //int touch_last_x = (gt911_dev.points[0].x - TOUCH_MAP_X1) * (800 - 1) / (TOUCH_MAP_X2 - TOUCH_MAP_X1);
-        //int touch_last_y = (gt911_dev.points[0].y - TOUCH_MAP_Y1) * (480 - 1) / (TOUCH_MAP_Y2 - TOUCH_MAP_Y1);
- 
         int32_t touch_last_x = 0;
         int32_t touch_last_y = 0;
 
